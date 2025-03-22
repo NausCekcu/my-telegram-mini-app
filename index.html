@@ -1,55 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Mini App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-    .container {
-      text-align: center;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orfistore - Биты</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2a2a2a;
+            border-bottom: 1px solid #404040;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .lang-button {
+            padding: 8px 12px;
+            background-color: #404040;
+            border-radius: 8px;
+            font-size: 14px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .lang-button:hover {
+            background-color: #505050;
+        }
+
+        .cart-button {
+            position: relative;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #404040;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+
+        main {
+            padding: 24px;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .search-input::placeholder {
+            color: #808080;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #808080;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 24px;
+        }
+
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        @media (max-width: 1024px) {
+            .genres-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .genre-card {
+            padding: 20px;
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .genre-card:hover {
+            background-color: #404040;
+        }
+
+        .genre-card.active {
+            background-color: #4CAF50;
+        }
+
+        .genre-name {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .genre-count {
+            font-size: 14px;
+            color: #808080;
+        }
+
+        .genre-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .genre-tag {
+            padding: 8px 16px;
+            background-color: #404040;
+            border-radius: 6px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .genre-tag:hover {
+            background-color: #505050;
+        }
+
+        .genre-tag.active {
+            background-color: #4CAF50;
+        }
+
+        .beats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .beats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .beats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .beat-card {
+            background-color: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .beat-image {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+            aspect-ratio: 16/9;
+        }
+
+        .beat-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .beat-name {
+            font-size: 18px;
+        }
+
+        .beat-price {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .beat-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 14px;
+            color: #808080;
+        }
+
+        .stat-pill {
+            background-color: #404040;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            border-radius: 8px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Хуйня</h1>
-    <p>This is a simple mini app hosted on GitHub Pages.</p>
-    <button id="sendDataButton">Send Data to Bot</button>
-  </div>
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    <div x-data="{ 
+        lang: 'ru',
+        searchQuery: '',
+        selectedGenre: null,
+        cart: [],
+        showCart: false,
+        genres: [
+            {id: 1, name: 'Трэп', count: 156},
+            {id: 2, name: 'Хип-хоп', count: 143},
+            {id: 3, name: 'R&B', count: 89},
+            {id: 4, name: 'Поп', count: 76},
+            {id: 5, name: 'Дрилл', count: 67},
+            {id: 6, name: 'Ло-фай', count: 45},
+            {id: 7, name: 'Эмбиент', count: 34},
+            {id: 8, name: 'Хаус', count: 56}
+        ],
+        beats: [
+            {id: 1, genre: 1, name: 'Ночной райдер', price: 2999, bpm: 140, key: 'Am', plays: 12503},
+            {id: 2, genre: 1, name: 'Тёмная материя', price: 3499, bpm: 145, key: 'Fm', plays: 8420},
+            {id: 3, genre: 2, name: 'Уличная жизнь', price: 2499, bpm: 95, key: 'Cm', plays: 15234},
+            {id: 4, genre: 3, name: 'Душевный', price: 3999, bpm: 85, key: 'Gm', plays: 6789},
+            {id: 5, genre: 1, name: 'Неоновые мечты', price: 2999, bpm: 138, key: 'Em', plays: 9876},
+            {id: 6, genre: 2, name: 'Городской флоу', price: 3299, bpm: 92, key: 'Dm', plays: 11234}
+        ]
+    }">
+        <header>
+            <h1 class="logo">orfistore</h1>
+            <div class="header-buttons">
+                <button class="lang-button" x-text="lang.toUpperCase()" x-on:click="lang = lang === 'ru' ? 'en' : 'ru'"></button>
+                <button class="cart-button" x-on:click="showCart = true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-[24px] h-[24px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span class="cart-count" x-show="cart.length > 0" x-text="cart.length"></span>
+                </button>
+            </div>
+        </header>
 
-    document.getElementById('sendDataButton').addEventListener('click', () => {
-      const data = { message: "Hello from Mini App" };
-      tg.sendData(JSON.stringify(data));
-    });
-  </script>
+        <main>
+            <div class="search-container">
+                <input type="text" 
+                    class="search-input" 
+                    x-model="searchQuery"
+                    x-bind:placeholder="lang === 'ru' ? 'Поиск битов...' : 'Search beats...'"
+                >
+                <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+
+            <section>
+                <h2 class="section-title" x-text="lang === 'ru' ? 'Популярные жанры' : 'Popular Genres'"></h2>
+                <div class="genres-grid">
+                    <template x-for="genre in genres.slice(0, 5)">
+                        <div class="genre-card" 
+                            x-bind:class="{ 'active': selectedGenre === genre.id }"
+                            x-on:click="selectedGenre = genre.id">
+                            <div class="genre-name" x-text="genre.name"></div>
+                            <div class="genre-count" x-text="genre.count + (lang === 'ru' ? ' битов' : ' beats')"></div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title" x-text="lang === 'ru' ? 'Все жанры' : 'All Genres'"></h2>
+                <div class="genre-tags">
+                    <template x-for="genre in genres">
+                        <button class="genre-tag"
+                            x-bind:class="{ 'active': selectedGenre === genre.id }"
+                            x-on:click="selectedGenre = genre.id"
+                            x-text="genre.name">
+                        </button>
+                    </template>
+                </div>
+            </section>
+
+            <div class="beats-grid">
+                <template x-for="beat in beats.filter(b => !selectedGenre || b.genre === selectedGenre)">
+                    <div class="beat-card">
+                        <img src="https://placehold.co/400x225" class="beat-image" alt="Beat Cover">
+                        <div class="beat-info">
+                            <span class="beat-name" x-text="beat.name"></span>
+                            <span class="beat-price" x-text="beat.price + ' ₽'"></span>
+                        </div>
+                        <div class="beat-stats">
+                            <div class="stat-pill">
+                                <span x-text="beat.bpm"></span>
+                                <span>BPM</span>
+                            </div>
+                            <div class="stat-pill">
+                                <span x-text="lang === 'ru' ? 'Тональность: ' : 'Key: '"></span>
+                                <span x-text="beat.key"></span>
+                            </div>
+                            <div class="stat-pill">
+                                <span x-text="(beat.plays / 1000).toFixed(1) + 'K'"></span>
+                                <span x-text="lang === 'ru' ? ' прослушиваний' : ' plays'"></span>
+                            </div>
+                        </div>
+                        <button class="add-to-cart-btn" 
+                            x-on:click="cart.push(beat)"
+                            x-text="lang === 'ru' ? 'Добавить в корзину' : 'Add to Cart'">
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </main>
+
+        <!-- Cart Modal -->
+        <div x-show="showCart" 
+            class="fixed inset-0 bg-black bg-opacity-80 flex justify-end"
+            style="display: none;">
+            <div class="w-full max-w-md bg-[#2a2a2a] h-full p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-light" x-text="lang === 'ru' ? 'Корзина' : 'Cart'"></h2>
+                    <button class="text-2xl" x-on:click="showCart = false">×</button>
+                </div>
+                <div class="flex-1 overflow-y-auto">
+                    <template x-for="item in cart">
+                        <div class="flex justify-between items-center p-3 bg-[#404040] rounded-lg mb-3">
+                            <span x-text="item.name"></span>
+                            <div class="flex items-center gap-3">
+                                <span x-text="item.price + ' ₽'"></span>
+                                <button class="text-red-500" 
+                                    x-on:click="cart = cart.filter(i => i.id !== item.id)"
+                                    x-text="lang === 'ru' ? 'Удалить' : 'Remove'">
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="mt-6 pt-6 border-t border-[#404040]">
+                    <div class="flex justify-between items-center mb-4">
+                        <span x-text="lang === 'ru' ? 'Итого' : 'Total'"></span>
+                        <span x-text="cart.reduce((sum, item) => sum + item.price, 0) + ' ₽'"></span>
+                    </div>
+                    <button class="w-full py-3 bg-[#4CAF50] rounded-lg"
+                        x-text="lang === 'ru' ? 'Оформить заказ' : 'Checkout'">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
